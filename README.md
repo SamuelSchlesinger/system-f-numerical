@@ -1,8 +1,8 @@
 # system-f-numerical
 
 Church-encoded natural numbers, finite lists, and the full
-**hyperoperation hierarchy** — addition, multiplication,
-exponentiation, tetration, pentation — in roughly forty lines of pure
+**hyperoperation hierarchy** (addition, multiplication,
+exponentiation, tetration, pentation) in roughly forty lines of pure
 System F.
 
 All computation is driven by polymorphic instantiation. There is no
@@ -55,6 +55,23 @@ The type application `e @Nat` instantiates the universally-quantified
 **impredicative polymorphism**, and it is what makes the one-liner
 `hypSuc` type-check.
 
+## Predecessor
+
+Successor is trivial on Church numerals; predecessor is not, because a
+Church numeral cannot inspect its own representation. The classical
+workaround is to slide a pair:
+
+```haskell
+pred :: Nat -> Nat
+pred n = fst (n @(Nat, Nat) step (zero, zero))
+  where step (_, b) = (b, suc b)
+```
+
+Iterating `step` from `(0, 0)` produces `(n - 1, n)` after `n` rounds,
+and `(0, 0)` stays put at `n = 0`. Here the pair type `(Nat, Nat)`
+itself contains polymorphic components, so this is another
+impredicative instantiation.
+
 ## Example
 
 ```
@@ -70,7 +87,7 @@ ghci> toInteger (pent (fromInteger 2) (fromInteger 3))
 
 ## Lists as a companion
 
-The same trick gives a Church encoding of finite lists — it is the
+The same trick gives a Church encoding of finite lists. It is the
 natural-number encoding with an extra element argument at each fold
 step:
 
@@ -94,7 +111,7 @@ cabal build
 cabal test
 ```
 
-The test suite is `hspec` + `QuickCheck`: 124 cases covering
+The test suite is `hspec` + `QuickCheck`: 132 cases covering
 
 - round-trip properties for `Nat` ↔ `Integer` and `List` ↔ `[]`,
 - arithmetic laws (associativity, commutativity, distributivity,
@@ -108,7 +125,7 @@ The test suite is `hspec` + `QuickCheck`: 124 cases covering
 
 ## Requirements
 
-- GHC 9.6+ — the module uses `ImpredicativeTypes`, `RankNTypes`, and
+- GHC 9.6+. The module uses `ImpredicativeTypes`, `RankNTypes`, and
   `TypeApplications`.
 
 ## Caveats
@@ -126,7 +143,7 @@ interactively.
   coupures de l'arithmétique d'ordre supérieur*, 1972.
 - John C. Reynolds, *Towards a theory of type structure*, 1974.
 - Donald E. Knuth, "Mathematics and Computer Science: Coping with
-  Finiteness," *Science* 194 (1976), pp. 1235–1242 — the up-arrow
+  Finiteness," *Science* 194 (1976), pp. 1235–1242; the up-arrow
   notation.
 
 ## License

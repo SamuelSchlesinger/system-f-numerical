@@ -4,8 +4,8 @@ version:         0.1.0.0
 synopsis:        Church-encoded naturals, lists, and hyperoperations in System F.
 description:
     A minimal System-F development of natural numbers, finite lists,
-    and the full hyperoperation hierarchy — addition, multiplication,
-    exponentiation, tetration, pentation — with no recursion over
+    and the full hyperoperation hierarchy (addition, multiplication,
+    exponentiation, tetration, pentation) with no recursion over
     data constructors. All arithmetic is driven by polymorphic
     instantiation, and the successor of the hyperoperation hierarchy
     is captured in a single combinator @hypSuc@ whose definition
@@ -23,10 +23,9 @@ tested-with:     GHC == 9.6.7
 extra-doc-files: CHANGELOG.md
                  README.md
 
--- Fill in once a public git remote exists:
--- source-repository head
---     type:     git
---     location: https://github.com/<you>/system-f-numerical
+source-repository head
+    type:     git
+    location: https://github.com/SamuelSchlesinger/system-f-numerical
 
 common warnings
     ghc-options: -Wall

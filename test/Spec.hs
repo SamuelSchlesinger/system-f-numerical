@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeApplications #-}
 module Main (main) where
 
-import Prelude hiding (fromInteger, toInteger, exp)
+import Prelude hiding (fromInteger, toInteger, exp, pred)
 
 import Control.Exception (evaluate)
 import Test.Hspec
@@ -84,6 +84,37 @@ main = hspec $ do
 
     it "fromIntegerStrict errors on negatives" $
       evaluate (fromIntegerStrict (-1) :: Nat) `shouldThrow` anyErrorCall
+
+  ----------------------------------------------------------------
+  describe "predecessor (pred)" $ do
+
+    it "pred 0 = 0" $
+      toIntegerStrict (pred zero) `shouldBe` 0
+
+    it "pred 1 = 0" $
+      toIntegerStrict (pred (suc zero)) `shouldBe` 0
+
+    it "pred 2 = 1" $
+      toIntegerStrict (pred (suc (suc zero))) `shouldBe` 1
+
+    it "pred 7 = 6" $
+      toIntegerStrict (pred (fromIntegerStrict 7)) `shouldBe` 6
+
+    it "pred 100 = 99" $
+      toIntegerStrict (pred (fromIntegerStrict 100)) `shouldBe` 99
+
+    prop "pred matches max 0 (n - 1) on Integer" $
+      forAll smallNat $ \n ->
+        toIntegerStrict (pred (fromIntegerStrict n))
+          === max 0 (n - 1)
+
+    prop "pred . suc = id" $
+      forAll smallNat $ \n ->
+        toIntegerStrict (pred (suc (fromIntegerStrict n))) === n
+
+    prop "suc . pred = id  (for n >= 1)" $
+      forAll (chooseInteger (1, 50)) $ \n ->
+        toIntegerStrict (suc (pred (fromIntegerStrict n))) === n
 
   ----------------------------------------------------------------
   describe "addition (add)" $ do

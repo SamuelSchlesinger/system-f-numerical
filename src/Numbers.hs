@@ -12,8 +12,8 @@
 -- Portability : requires ImpredicativeTypes
 --
 -- A minimal System-F development of natural numbers, finite lists, and
--- the full /hyperoperation hierarchy/ — successor, addition,
--- multiplication, exponentiation, tetration, pentation, … — with no
+-- the full /hyperoperation hierarchy/ (successor, addition,
+-- multiplication, exponentiation, tetration, pentation, ...) with no
 -- recursion over data constructors and no inductive 'Data.Nat'-style
 -- type. Every value here is a plain polymorphic function; all
 -- computation is driven by polymorphic instantiation.
@@ -50,8 +50,8 @@
 --
 -- Here @e@ is itself a Church numeral, so the type application
 -- @e \@'Nat'@ instantiates its universally-quantified type variable at
--- the polymorphic type 'Nat' itself — an impredicative instantiation,
--- hence @ImpredicativeTypes@. 'exp', 'tet', and 'pent' become
+-- the polymorphic type 'Nat' itself, an impredicative instantiation
+-- (hence @ImpredicativeTypes@). 'exp', 'tet', and 'pent' become
 -- one-liners over 'hypSuc'.
 --
 -- == Example
@@ -77,6 +77,7 @@ module Numbers
     Nat
   , zero
   , suc
+  , pred
     -- * Marshalling naturals
   , toInteger
   , fromInteger
@@ -99,7 +100,7 @@ module Numbers
   , lmul
   ) where
 
-import Prelude hiding (fromInteger, toInteger, exp)
+import Prelude hiding (fromInteger, toInteger, exp, pred)
 
 -- | Church-encoded natural numbers.
 --
@@ -126,6 +127,28 @@ zero = \_ -> id
 -- @'toInteger' ('suc' ('suc' 'zero')) == 2@.
 suc :: Nat -> Nat
 suc n = \f -> f . n f
+
+-- | Predecessor, truncated at zero: @pred 0 = 0@ and
+-- @pred (n + 1) = n@.
+--
+-- Church-numeral predecessor is famously trickier than successor, since
+-- a Church numeral cannot inspect its own representation. The standard
+-- trick is to /slide a pair/: starting from @(0, 0)@, each iteration
+-- replaces @(_, b)@ with @(b, 'suc' b)@; after @n@ steps the pair is
+-- @(n - 1, n)@ (or @(0, 0)@ when @n = 0@), and 'fst' picks out the
+-- predecessor.
+--
+-- The type application @\@('Nat', 'Nat')@ is another impredicative
+-- instantiation: the tuple's two components are themselves polymorphic
+-- types.
+--
+-- @'toInteger' ('pred' ('fromInteger' 5)) == 4@,
+-- @'toInteger' ('pred' 'zero') == 0@.
+pred :: Nat -> Nat
+pred n = fst (n @(Nat, Nat) step (zero, zero))
+  where
+    step :: (Nat, Nat) -> (Nat, Nat)
+    step (_, b) = (b, suc b)
 
 -- | Convert a 'Nat' to a native 'Integer' by instantiating the iterator
 -- at @Integer -> Integer@ with step @(+ 1)@ and starting value @0@.
