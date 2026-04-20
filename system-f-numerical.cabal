@@ -1,0 +1,52 @@
+cabal-version:   3.14
+name:            system-f-numerical
+version:         0.1.0.0
+synopsis:        Church-encoded naturals, lists, and hyperoperations in System F.
+description:
+    A minimal System-F development of natural numbers, finite lists,
+    and the full hyperoperation hierarchy — addition, multiplication,
+    exponentiation, tetration, pentation — with no recursion over
+    data constructors. All arithmetic is driven by polymorphic
+    instantiation, and the successor of the hyperoperation hierarchy
+    is captured in a single combinator @hypSuc@ whose definition
+    relies on impredicative polymorphism.
+    .
+    Intended as a teaching and demonstration package.
+license:         BSD-3-Clause
+license-file:    LICENSE
+author:          Samuel Schlesinger
+maintainer:      sgschlesinger@gmail.com
+copyright:       (c) 2026 Samuel Schlesinger
+category:        Math, Teaching
+build-type:      Simple
+tested-with:     GHC == 9.6.7
+extra-doc-files: CHANGELOG.md
+                 README.md
+
+-- Fill in once a public git remote exists:
+-- source-repository head
+--     type:     git
+--     location: https://github.com/<you>/system-f-numerical
+
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    exposed-modules:  Numbers
+    build-depends:    base ^>=4.18.3.0
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+test-suite system-f-numerical-test
+    import:           warnings
+    default-language: Haskell2010
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Spec.hs
+    build-depends:
+        base ^>=4.18.3.0,
+        system-f-numerical,
+        hspec       >=2.10 && <2.12,
+        QuickCheck  >=2.14 && <2.16
+    ghc-options:      -threaded -rtsopts
